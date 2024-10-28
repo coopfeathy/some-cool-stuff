@@ -1,101 +1,188 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import { useState, useEffect, useRef } from 'react'
+import { motion, useAnimation, useInView } from 'framer-motion'
+import { ExternalLink, Instagram, Code, Laugh, DollarSign } from 'lucide-react'
+import { Card, CardContent } from "@/components/ui/card"
+import Link from 'next/link'
+
+export default function Component() {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [cursorVariant, setCursorVariant] = useState('default')
+  const [stars, setStars] = useState<{ top: string; left: string; delay: string }[]>([])
+
+  useEffect(() => {
+    const mouseMove = (e: MouseEvent) => {
+      setMousePosition({
+        x: e.clientX,
+        y: e.clientY
+      })
+    }
+
+    window.addEventListener("mousemove", mouseMove)
+
+    // Generate stars on the client-side
+    setStars(
+      [...Array(100)].map(() => ({
+        top: `${Math.random() * 100}%`,
+        left: `${Math.random() * 100}%`,
+        delay: `${Math.random() * 2}s`,
+      }))
+    )
+
+    return () => {
+      window.removeEventListener("mousemove", mouseMove)
+    }
+  }, [])
+
+  const variants = {
+    default: {
+      x: mousePosition.x - 16,
+      y: mousePosition.y - 16,
+    },
+    project: {
+      height: 150,
+      width: 150,
+      x: mousePosition.x - 75,
+      y: mousePosition.y - 75,
+      backgroundColor: "white",
+      mixBlendMode: "difference" as const
+    }
+  }
+
+  const projects = [
+    { title: "Dad Jokes App", description: "Visit to see a random dad joke.", icon: <Laugh className="w-12 h-12" />, color: "bg-blue-500", live: "https://coopers-dad-jokes.netlify.app" },
+    { title: "20 $ Methods", description: "Visit to learn about different money methods.", icon: <DollarSign className="w-12 h-12" />, color: "bg-green-500", live: "https://20moneymethods.netlify.app" },
+    { title: "CF LLC", description: "A Company.", icon: <Code className="w-12 h-12" />, color: "bg-purple-500", live: "https://cf-llc.github.io" },
+  ]
+
+  const controls = useAnimation()
+  const ref = useRef(null)
+  const inView = useInView(ref)
+
+  useEffect(() => {
+    if (inView) {
+      controls.start("visible")
+    }
+  }, [controls, inView])
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white p-8 relative overflow-hidden">
+      <motion.div
+        className="fixed top-0 left-0 w-8 h-8 rounded-full bg-white mix-blend-difference pointer-events-none z-50"
+        variants={variants}
+        animate={cursorVariant}
+        transition={{ type: "spring", stiffness: 500, damping: 28 }}
+      />
+      <div className="absolute inset-0 overflow-hidden opacity-20">
+        {stars.map((star, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 bg-white rounded-full"
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{
+              duration: 2,
+              delay: parseFloat(star.delay),
+              repeat: Infinity,
+              repeatType: "reverse"
+            }}
+            style={{
+              top: star.top,
+              left: star.left,
+            }}
+          />
+        ))}
+      </div>
+      <header className="text-center mb-12 flex flex-col items-center">
+        <motion.div
+          className="w-32 h-32 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full flex items-center justify-center mb-4"
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: "spring", stiffness: 260, damping: 20 }}
+        >
+          <span className="text-4xl font-bold">CF</span>
+        </motion.div>
+        <motion.h1
+          className="text-4xl font-bold mb-2"
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          Cooper Featherstone
+        </motion.h1>
+        <motion.p
+          className="text-xl mb-4"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          @coopfeathy
+        </motion.p>
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          <Link href="https://instagram.com/coopfeathy" target="_blank" rel="noopener noreferrer" className="flex items-center text-blue-400 hover:text-blue-300 transition-colors duration-300">
+            <Instagram className="w-5 h-5 mr-2" />
+            Find me on Instagram
+          </Link>
+        </motion.div>
+      </header>
+      <motion.div
+        ref={ref}
+        initial="hidden"
+        animate={controls}
+        variants={{
+          hidden: { opacity: 0 },
+          visible: {
+            opacity: 1,
+            transition: {
+              delayChildren: 0.3,
+              staggerChildren: 0.2
+            }
+          }
+        }}
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+      >
+        {projects.map((project, index) => (
+          <motion.div
+            key={index}
+            variants={{
+              hidden: { y: 20, opacity: 0 },
+              visible: {
+                y: 0,
+                opacity: 1
+              }
+            }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+            <Card 
+              className="bg-gray-800 border-gray-700 overflow-hidden transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg"
+              onMouseEnter={() => setCursorVariant("project")}
+              onMouseLeave={() => setCursorVariant("default")}
+            >
+              <CardContent className="p-0">
+                <div className="relative group">
+                  <div className={`w-full h-48 ${project.color} flex items-center justify-center transition-all duration-300 group-hover:opacity-20`}>
+                    {project.icon}
+                  </div>
+                  <div className="absolute inset-0 bg-black bg-opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center p-4">
+                    <h3 className="text-xl font-bold mb-2">{project.title}</h3>
+                    <p className="text-sm mb-4 text-center">{project.description}</p>
+                    <div className="flex space-x-4">
+                      <Link href={project.live} target="_blank" rel="noopener noreferrer" className="text-white hover:text-gray-300 transition-colors duration-300">
+                        <ExternalLink className="w-6 h-6" />
+                        <span className="sr-only">Live site for {project.title}</span>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </motion.div>
     </div>
-  );
+  )
 }
