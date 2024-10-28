@@ -124,10 +124,15 @@ export default function Component() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
         >
-          <Link href="https://instagram.com/coopfeathy" target="_blank" rel="noopener noreferrer" className="flex items-center text-blue-400 hover:text-blue-300 transition-colors duration-300">
+          <a
+            href="https://instagram.com/coopfeathy" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="flex items-center text-blue-400 hover:text-blue-300 transition-colors duration-300"
+          >
             <Instagram className="w-5 h-5 mr-2" />
             Find me on Instagram
-          </Link>
+          </a>
         </motion.div>
       </header>
       <motion.div
